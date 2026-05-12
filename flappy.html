@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Clone</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#4ec0ca; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let birdY = canvas.height / 2;
+let birdVY = 0;
+const gravity = 0.4;
+const flap = -7;
+
+let pipes = [];
+let frame = 0;
+let score = 0;
+let gameOver = false;
+let keys = {};
+
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+canvas.addEventListener('click', flapInput);
+
+function flapInput() {
+    if (gameOver) reset();
+    else birdVY = flap;
+}
+
+function reset() {
+    birdY = canvas.height / 2;
+    birdVY = 0;
+    pipes = [];
+    frame = 0;
+    score = 0;
+    gameOver = false;
+}
+
+function spawnPipe() {
+    const gap = 140;
+    const topHeight = Math.random() * (canvas.height - gap - 100) + 50;
+    pipes.push({
+        x: canvas.width,
+        top: topHeight,
+        bottom: topHeight + gap,
+        passed: false
+    });
+}
+
+function update() {
+    if (gameOver) return;
+
+    frame++;
+    birdVY += gravity;
+    birdY += birdVY;
+
+    if (keys['Space']) {
+        flapInput();
+        keys['Space'] = false;
+    }
+
+    if (frame % 90 === 0) spawnPipe();
+
+    pipes.forEach(pipe => pipe.x -= 2.5);
+    pipes = pipes.filter(pipe => pipe.x + 60 > 0);
+
+    for (const pipe of pipes) {
+        if (pipe.x + 60 < 200 && !pipe.passed) {
+            pipe.passed = true;
+            score++;
+        }
+        const inX = 200 > pipe.x && 200 < pipe.x + 60;
+        const hitTop = birdY < pipe.top;
+        const hitBottom = birdY > pipe.bottom;
+        if (inX && (hitTop || hitBottom)) gameOver = true;
+    }
+
+    if (birdY > canvas.height || birdY < 0) gameOver = true;
+}
+
+function draw() {
+    ctx.fillStyle = '#4ec0ca';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#ffeb3b';
+    ctx.beginPath();
+    ctx.arc(200, birdY, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#4caf50';
+    pipes.forEach(pipe => {
+        ctx.fillRect(pipe.x, 0, 60, pipe.top);
+        ctx.fillRect(pipe.x, pipe.bottom, 60, canvas.height - pipe.bottom);
+    });
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px system-ui';
+    ctx.fillText('Score: ' + score, 10, 30);
+
+    if (gameOver) {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = '32px system-ui';
+        ctx.fillText('Game Over', 120, 260);
+        ctx.font = '20px system-ui';
+        ctx.fillText('Click or Space to restart', 80, 300);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

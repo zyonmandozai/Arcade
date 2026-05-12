@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Space Shooter</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#000; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let shipX, bullets, enemies, frame, keys, lastShot;
+
+function reset() {
+    shipX = 200;
+    bullets = [];
+    enemies = [];
+    frame = 0;
+    keys = {};
+    lastShot = 0;
+}
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+function update() {
+    if (keys['ArrowLeft']) shipX -= 5;
+    if (keys['ArrowRight']) shipX += 5;
+    shipX = Math.max(20, Math.min(380, shipX));
+
+    if (keys['Space'] && performance.now() - lastShot > 200) {
+        bullets.push({x:shipX,y:520});
+        lastShot = performance.now();
+    }
+
+    bullets.forEach(b => b.y -= 8);
+    bullets = bullets.filter(b => b.y > -10);
+
+    frame++;
+    if (frame % 40 === 0) {
+        enemies.push({x:Math.random()*360+20,y:-20,dead:false});
+    }
+    enemies.forEach(e => e.y += 2);
+    enemies = enemies.filter(e => e.y < 620 && !e.dead);
+
+    for (const b of bullets) {
+        for (const e of enemies) {
+            if (!e.dead && Math.abs(b.x-e.x)<15 && Math.abs(b.y-e.y)<15) {
+                e.dead = true;
+                b.y = -999;
+            }
+        }
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,400,600);
+
+    ctx.fillStyle = '#0f0';
+    ctx.beginPath();
+    ctx.moveTo(shipX,540);
+    ctx.lineTo(shipX-15,580);
+    ctx.lineTo(shipX+15,580);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ff0';
+    bullets.forEach(b => ctx.fillRect(b.x-2,b.y-8,4,8));
+
+    ctx.fillStyle = '#f00';
+    enemies.forEach(e => ctx.fillRect(e.x-10,e.y-10,20,20));
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Action Supercross</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#001; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let track, bikeX, bikeY, bikeVX, bikeVY, angle, onGround, cameraX, keys;
+
+function reset() {
+    track = [];
+    for (let i=0;i<200;i++) {
+        const y = 500 + Math.sin(i/8)*40 + (Math.random()*20-10);
+        track.push({x:i*10,y});
+    }
+    bikeX = 50;
+    bikeY = 480;
+    bikeVX = 0;
+    bikeVY = 0;
+    angle = 0;
+    onGround = false;
+    cameraX = 0;
+    keys = {};
+}
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+function getGroundY(x) {
+    if (x<=0) return track[0].y;
+    const i = Math.floor(x/10);
+    if (i<0) return track[0].y;
+    if (i>=track.length-1) return track[track.length-1].y;
+    const t1 = track[i], t2 = track[i+1];
+    const t = (x - t1.x)/(t2.x - t1.x);
+    return t1.y*(1-t)+t2.y*t;
+}
+
+function update() {
+    if (keys['ArrowRight']) bikeVX += 0.2;
+    if (keys['ArrowLeft']) bikeVX -= 0.2;
+    if (keys['ArrowUp']) angle -= 0.05;
+    if (keys['ArrowDown']) angle += 0.05;
+
+    bikeVX *= 0.99;
+    bikeVY += 0.5;
+
+    bikeX += bikeVX;
+    bikeY += bikeVY;
+
+    const groundY = getGroundY(bikeX);
+    if (bikeY > groundY - 10) {
+        bikeY = groundY - 10;
+        bikeVY = 0;
+        onGround = true;
+    } else {
+        onGround = false;
+    }
+
+    cameraX = bikeX - 200;
+    if (cameraX < 0) cameraX = 0;
+}
+
+function draw() {
+    ctx.fillStyle = '#001';
+    ctx.fillRect(0,0,400,600);
+
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    track.forEach((p,i)=>{
+        const sx = p.x - cameraX;
+        const sy = p.y;
+        if (i===0) ctx.moveTo(sx,sy);
+        else ctx.lineTo(sx,sy);
+    });
+    ctx.stroke();
+
+    const bx = bikeX - cameraX;
+    const by = bikeY;
+
+    ctx.save();
+    ctx.translate(bx,by);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#ff0';
+    ctx.fillRect(-15,-5,30,10);
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-10,8,6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10,8,6,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

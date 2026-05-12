@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fly Game</title>
+<style>
+body { margin:0; background:#87ceeb; display:flex; justify-content:center; align-items:center; height:100vh; }
+canvas { background:#87ceeb; border:2px solid #fff; }
+</style>
+</head>
+<body>
+<canvas id="game" width="500" height="400"></canvas>
+<script>
+const c = document.getElementById("game");
+const x = c.getContext("2d");
+
+let px, py, clouds, frame, keys, gameOver;
+
+function reset() {
+    px = 250;
+    py = 200;
+    clouds = [];
+    frame = 0;
+    keys = {};
+    gameOver = false;
+}
+window.addEventListener("keydown", e => keys[e.code] = true);
+window.addEventListener("keyup", e => keys[e.code] = false);
+
+function update() {
+    if (gameOver) return;
+
+    if (keys["ArrowUp"]) py -= 4;
+    if (keys["ArrowDown"]) py += 4;
+    if (keys["ArrowLeft"]) px -= 4;
+    if (keys["ArrowRight"]) px += 4;
+
+    px = Math.max(10, Math.min(490, px));
+    py = Math.max(10, Math.min(390, py));
+
+    frame++;
+    if (frame % 40 === 0) clouds.push({x:500,y:Math.random()*350});
+
+    clouds.forEach(c => c.x -= 5);
+    clouds = clouds.filter(c => c.x > -60);
+
+    for (const c2 of clouds) {
+        if (Math.abs(px - c2.x) < 30 && Math.abs(py - c2.y) < 30) gameOver = true;
+    }
+}
+
+function draw() {
+    x.fillStyle = "#87ceeb";
+    x.fillRect(0,0,500,400);
+
+    x.fillStyle = "#ff0";
+    x.fillRect(px-10,py-10,20,20);
+
+    x.fillStyle = "#fff";
+    clouds.forEach(c2 => x.fillRect(c2.x,c2.y,40,20));
+
+    if (gameOver) {
+        x.fillStyle = "#000";
+        x.font = "32px system-ui";
+        x.fillText("Crashed!", 180, 200);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Runner</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#222; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let x, y, vy, gravity, obstacles, frame, keys, gameOver;
+
+function reset() {
+    x = 50;
+    y = 500;
+    vy = 0;
+    gravity = 0.5;
+    obstacles = [];
+    frame = 0;
+    keys = {};
+    gameOver = false;
+}
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+function update() {
+    if (gameOver) return;
+
+    frame++;
+
+    if (keys['Space'] && y >= 500) vy = -12;
+
+    vy += gravity;
+    y += vy;
+    if (y > 500) y = 500;
+
+    if (frame % 90 === 0) obstacles.push({x:400});
+
+    obstacles.forEach(o => o.x -= 5);
+    obstacles = obstacles.filter(o => o.x > -40);
+
+    for (const o of obstacles) {
+        if (x+30 > o.x && x < o.x+30 && y+30 > 530 && y < 560) {
+            gameOver = true;
+        }
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0,0,400,600);
+
+    ctx.fillStyle = '#0f0';
+    ctx.fillRect(x,y,30,30);
+
+    ctx.fillStyle = '#f00';
+    obstacles.forEach(o => ctx.fillRect(o.x,530,30,30));
+
+    if (gameOver) {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(0,0,400,600);
+        ctx.fillStyle = '#fff';
+        ctx.font = '32px system-ui';
+        ctx.fillText('Game Over', 120, 260);
+        ctx.font = '20px system-ui';
+        ctx.fillText('Refresh to restart', 110, 300);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

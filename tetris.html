@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tetris</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#111; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="200" height="400"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const cols = 10, rows = 20, size = 20;
+let grid, piece, keys, dropCounter, dropInterval;
+
+const shapes = [
+    [[1,1,1,1]],
+    [[1,1],[1,1]],
+    [[0,1,0],[1,1,1]],
+    [[1,0,0],[1,1,1]],
+    [[0,0,1],[1,1,1]],
+    [[1,1,0],[0,1,1]],
+    [[0,1,1],[1,1,0]]
+];
+
+function reset() {
+    grid = Array.from({length:rows},()=>Array(cols).fill(0));
+    keys = {};
+    dropCounter = 0;
+    dropInterval = 30;
+    spawnPiece();
+}
+window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (e.code === 'ArrowLeft') move(-1);
+    if (e.code === 'ArrowRight') move(1);
+    if (e.code === 'ArrowUp') rotate();
+    if (e.code === 'ArrowDown') drop();
+});
+
+function spawnPiece() {
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    piece = {
+        x: 3,
+        y: 0,
+        shape
+    };
+    if (collide(0,0,piece.shape)) {
+        reset();
+    }
+}
+
+function collide(offX, offY, shape) {
+    for (let y=0;y<shape.length;y++) {
+        for (let x=0;x<shape[y].length;x++) {
+            if (!shape[y][x]) continue;
+            const nx = piece.x + x + offX;
+            const ny = piece.y + y + offY;
+            if (ny >= rows || nx < 0 || nx >= cols || (ny>=0 && grid[ny][nx])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function merge() {
+    const s = piece.shape;
+    for (let y=0;y<s.length;y++) {
+        for (let x=0;x<s[y].length;x++) {
+            if (s[y][x]) {
+                const ny = piece.y + y;
+                const nx = piece.x + x;
+                if (ny>=0) grid[ny][nx] = 1;
+            }
+        }
+    }
+    clearLines();
+    spawnPiece();
+}
+
+function clearLines() {
+    for (let y=rows-1;y>=0;y--) {
+        if (grid[y].every(v=>v)) {
+            grid.splice(y,1);
+            grid.unshift(Array(cols).fill(0));
+            y++;
+        }
+    }
+}
+
+function move(dir) {
+    if (!collide(dir,0,piece.shape)) piece.x += dir;
+}
+
+function rotate() {
+    const s = piece.shape;
+    const rotated = s[0].map((_,i)=>s.map(r=>r[i]).reverse());
+    if (!collide(0,0,rotated)) piece.shape = rotated;
+}
+
+function drop() {
+    if (!collide(0,1,piece.shape)) {
+        piece.y++;
+    } else {
+        merge();
+    }
+}
+
+function update() {
+    dropCounter++;
+    if (dropCounter > dropInterval) {
+        dropCounter = 0;
+        drop();
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    for (let y=0;y<rows;y++) {
+        for (let x=0;x<cols;x++) {
+            if (grid[y][x]) {
+                ctx.fillStyle = '#0ff';
+                ctx.fillRect(x*size,y*size,size-1,size-1);
+            }
+        }
+    }
+
+    const s = piece.shape;
+    ctx.fillStyle = '#ff0';
+    for (let y=0;y<s.length;y++) {
+        for (let x=0;x<s[y].length;x++) {
+            if (s[y][x]) {
+                const nx = piece.x + x;
+                const ny = piece.y + y;
+                if (ny>=0) ctx.fillRect(nx*size,ny*size,size-1,size-1);
+            }
+        }
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

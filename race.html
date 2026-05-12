@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini Racer</title>
+<style>
+body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+canvas { background:#222; border:2px solid #fff; }
+</style>
+</head>
+<body>
+<canvas id="game" width="300" height="600"></canvas>
+<script>
+const c = document.getElementById("game");
+const x = c.getContext("2d");
+
+let px, py, cars, frame, keys, gameOver;
+
+function reset() {
+    px = 140;
+    py = 500;
+    cars = [];
+    frame = 0;
+    keys = {};
+    gameOver = false;
+}
+window.addEventListener("keydown", e => keys[e.code] = true);
+window.addEventListener("keyup", e => keys[e.code] = false);
+
+function update() {
+    if (gameOver) return;
+
+    if (keys["ArrowLeft"]) px -= 5;
+    if (keys["ArrowRight"]) px += 5;
+    px = Math.max(20, Math.min(260, px));
+
+    frame++;
+    if (frame % 40 === 0) cars.push({x:Math.random()*200+20,y:-40});
+
+    cars.forEach(c => c.y += 6);
+    cars = cars.filter(c => c.y < 640);
+
+    for (const c2 of cars) {
+        if (Math.abs(px - c2.x) < 30 && Math.abs(py - c2.y) < 40) gameOver = true;
+    }
+}
+
+function draw() {
+    x.fillStyle = "#222";
+    x.fillRect(0,0,300,600);
+
+    x.fillStyle = "#0f0";
+    x.fillRect(px-15,py-20,30,40);
+
+    x.fillStyle = "#f00";
+    cars.forEach(c2 => x.fillRect(c2.x-15,c2.y-20,30,40));
+
+    if (gameOver) {
+        x.fillStyle = "#fff";
+        x.font = "32px system-ui";
+        x.fillText("Crash!", 100, 300);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>
