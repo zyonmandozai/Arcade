@@ -1,0 +1,11 @@
+# Use a lightweight web server
+FROM pierrezemb/gostatic
+
+# Copy all files into the container
+COPY . /srv/http
+
+# Expose port 8043 (gostatic default)
+EXPOSE 8043
+
+# Run the static server
+CMD ["-port", "8043"]
