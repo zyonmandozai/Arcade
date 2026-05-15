@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Zyon Arcade Deluxe</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: 280px;
+      height: 100vh;
+      background: #1a1a1a;
+      position: fixed;
+      left: 0;
+      top: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transform: translateX(0);
+      transition: 0.3s ease;
+      z-index: 10;
+    }
+
+    #sidebar.hidden {
+      transform: translateX(-280px);
+    }
+
+    #toggleMenu {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 6px;
+      z-index: 20;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    /* SEARCH BAR */
+    #search {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      background: #333;
+      color: white;
+    }
+
+    /* CATEGORY LABEL */
+    .category {
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    /* BUTTONS */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #262626;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 6px;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      background: #333;
+      transform: scale(1.03);
+    }
+
+    /* ICONS */
+    .icon {
+      width: 22px;
+      height: 22px;
+      background: #555;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* IFRAME */
+    #gameframe {
+      position: absolute;
+      left: 280px;
+      top: 0;
+      width: calc(100% - 280px);
+      height: 100vh;
+      border: none;
+      background: black;
+      transition: 0.3s ease;
+    }
+
+    /* MOBILE */
+    @media (max-width: 800px) {
+      #gameframe {
+        left: 0;
+        width: 100%;
+      }
+      #sidebar {
+        transform: translateX(-280px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button id="toggleMenu" onclick="toggleSidebar()">☰</button>
+
+<div id="sidebar">
+
+  <h1>Zyon Arcade</h1>
+
+  <input id="search" placeholder="Search games..." oninput="filterGames()">
+
+  <div id="gameList">
+
+    <div class="category">Neal.fun</div>
+    <button class="btn" onclick="loadGame('simulation-clicker.html')"><div class="icon"></div>Simulation Clicker</button>
+    <button class="btn" onclick="loadGame('design-the-next-phone.html')"><div class="icon"></div>Design The Next Phone</button>
+
+    <div class="category">Dash Games</div>
+    <button class="btn" onclick="loadGame('gdashbreeze.html')"><div class="icon"></div>GD Breeze</button>
+    <button class="btn" onclick="loadGame('gdashlite.html')"><div class="icon"></div>GD Lite</button>
+    <button class="btn" onclick="loadGame('gdashsubzero.html')"><div class="icon"></div>GD Subzero</button>
+
+    <div class="category">Classics</div>
+    <button class="btn" onclick="loadGame('pong.html')"><div class="icon"></div>Pong</button>
+    <button class="btn" onclick="loadGame('tetris.html')"><div class="icon"></div>Tetris</button>
+    <button class="btn" onclick="loadGame('snake.html')"><div class="icon"></div>Snake</button>
+    <button class="btn" onclick="loadGame('breakout.html')"><div class="icon"></div>Breakout</button>
+    <button class="btn" onclick="loadGame('asteroids.html')"><div class="icon"></div>Asteroids</button>
+
+    <div class="category">Arcade</div>
+    <button class="btn" onclick="loadGame('2048.html')"><div class="icon"></div>2048</button>
+    <button class="btn" onclick="loadGame('bounce.html')"><div class="icon"></div>Bounce</button>
+    <button class="btn" onclick="loadGame('flappy.html')"><div class="icon"></div>Flappy</button>
+    <button class="btn" onclick="loadGame('race.html')"><div class="icon"></div>Race</button>
+    <button class="btn" onclick="loadGame('runner.html')"><div class="icon"></div>Runner</button>
+    <button class="btn" onclick="loadGame('slide.html')"><div class="icon"></div>Slide</button>
+    <button class="btn" onclick="loadGame('stack.html')"><div class="icon"></div>Stack</button>
+    <button class="btn" onclick="loadGame('supercross.html')"><div class="icon"></div>Supercross</button>
+    <button class="btn" onclick="loadGame('swim.html')"><div class="icon"></div>Swim</button>
+
+    <div class="category">Puzzle</div>
+    <button class="btn" onclick="loadGame('maze.html')"><div class="icon"></div>Maze</button>
+    <button class="btn" onclick="loadGame('memory.html')"><div class="icon"></div>Memory</button>
+    <button class="btn" onclick="loadGame('reaction.html')"><div class="icon"></div>Reaction</button>
+
+    <div class="category">Platformers</div>
+    <button class="btn" onclick="loadGame('platformer.html')"><div class="icon"></div>Platformer</button>
+    <button class="btn" onclick="loadGame('jump.html')"><div class="icon"></div>Jump</button>
+    <button class="btn" onclick="loadGame('tower.html')"><div class="icon"></div>Tower</button>
+
+    <div class="category">Shooters</div>
+    <button class="btn" onclick="loadGame('laser.html')"><div class="icon"></div>Laser</button>
+    <button class="btn" onclick="loadGame('space.html')"><div class="icon"></div>Space Shooter</button>
+
+    <div class="category">Sim / Idle</div>
+    <button class="btn" onclick="loadGame('idle.html')"><div class="icon"></div>Idle</button>
+    <button class="btn" onclick="loadGame('clicker.html')"><div class="icon"></div>Clicker</button>
+    <button class="btn" onclick="loadGame('infinitecraft.html')"><div class="icon"></div>Infinite Craft</button>
+
+    <div class="category">3D / Big Games</div>
+    <button class="btn" onclick="loadGame('minecraft.html')"><div class="icon"></div>Minecraft</button>
+    <button class="btn" onclick="loadGame('roblox.html')"><div class="icon"></div>Roblox</button>
+
+    <div class="category">Other</div>
+    <button class="btn" onclick="loadGame('gravity.html')"><div class="icon"></div>Gravity</button>
+    <button class="btn" onclick="loadGame('portal.html')"><div class="icon"></div>Portal</button>
+    <button class="btn" onclick="loadGame('warp.html')"><div class="icon"></div>Warp</button>
+    <button class="btn" onclick="loadGame('helicopter.html')"><div class="icon"></div>Helicopter</button>
+    <button class="btn" onclick="loadGame('argio.html')"><div class="icon"></div>Argio</button>
+    <button class="btn" onclick="loadGame('dodge.html')"><div class="icon"></div>Dodge</button>
+    <button class="btn" onclick="loadGame('fly.html')"><div class="icon"></div>Fly</button>
+    <button class="btn" onclick="loadGame('typing.html')"><div class="icon"></div>Typing</button>
+    <button class="btn" onclick="loadGame('baldisbasics.html')"><div class="icon"></div>Baldi's Basics</button>
+
+  </div>
+</div>
+
+<iframe id="gameframe"></iframe>
+
+<script>
+  function loadGame(file) {
+    document.getElementById("gameframe").src = file;
+    localStorage.setItem("lastPlayed", file);
+  }
+
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("hidden");
+  }
+
+  function filterGames() {
+    let q = document.getElementById("search").value.toLowerCase();
+    let buttons = document.querySelectorAll(".btn");
+
+    buttons.forEach(btn => {
+      btn.style.display = btn.innerText.toLowerCase().includes(q) ? "flex" : "none";
+    });
+  }
+
+  // Auto-load last played game
+  let last = localStorage.getItem("lastPlayed");
+  if (last) document.getElementById("gameframe").src = last;
+</script>
+
+</body>
+</html>
