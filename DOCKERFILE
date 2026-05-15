@@ -1,11 +1,23 @@
-# Use a lightweight web server
-FROM pierrezemb/gostatic
+app = "zyon-arcade"
+primary_region = "yyz"
 
-# Copy all files into the container
-COPY . /srv/http
+[build]
 
-# Expose port 8043 (gostatic default)
-EXPOSE 8043
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
 
-# Run the static server
-CMD ["-port", "8043"]
+  [[http_service.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[http_service.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[http_service.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
