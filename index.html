@@ -116,6 +116,21 @@
       transition: 0.3s ease;
     }
 
+    /* LOADING OVERLAY */
+    #loading {
+      display: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.75);
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-size: 26px;
+      color: white;
+      z-index: 50;
+    }
+
     /* MOBILE */
     @media (max-width: 800px) {
       #gameframe {
@@ -199,18 +214,30 @@
     <button class="btn" onclick="loadGame('dodge.html')"><div class="icon"></div>Dodge</button>
     <button class="btn" onclick="loadGame('fly.html')"><div class="icon"></div>Fly</button>
     <button class="btn" onclick="loadGame('typing.html')"><div class="icon"></div>Typing</button>
+
     <button class="btn" onclick="loadGame('baldisbasics/index.html')">
-    <div class="icon"></div>Baldi's Basics
-</button>
+      <div class="icon"></div>Baldi's Basics
+    </button>
 
   </div>
 </div>
+
+<div id="loading">Please wait...</div>
 
 <iframe id="gameframe"></iframe>
 
 <script>
   function loadGame(file) {
-    document.getElementById("gameframe").src = file;
+    const frame = document.getElementById("gameframe");
+    const loading = document.getElementById("loading");
+
+    loading.style.display = "block";  
+    frame.src = file;
+
+    frame.onload = () => {
+      loading.style.display = "none";
+    };
+
     localStorage.setItem("lastPlayed", file);
   }
 
@@ -227,9 +254,8 @@
     });
   }
 
-  // Auto-load last played game
   let last = localStorage.getItem("lastPlayed");
-  if (last) document.getElementById("gameframe").src = last;
+  if (last) loadGame(last);
 </script>
 
 </body>
