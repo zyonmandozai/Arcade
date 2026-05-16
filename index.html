@@ -116,19 +116,20 @@
       transition: 0.3s ease;
     }
 
-    /* LOADING OVERLAY */
+    /* LOADING OVERLAY — FIXED */
     #loading {
       display: none;
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.75);
-      padding: 20px 40px;
-      border-radius: 10px;
-      font-size: 26px;
+      background: rgba(0,0,0,0.85);
+      padding: 25px 50px;
+      border-radius: 12px;
+      font-size: 28px;
       color: white;
-      z-index: 50;
+      z-index: 9999;
+      text-align: center;
     }
 
     /* MOBILE */
@@ -231,11 +232,14 @@
     const frame = document.getElementById("gameframe");
     const loading = document.getElementById("loading");
 
-    loading.style.display = "block";  
+    loading.style.display = "block";
     frame.src = file;
 
+    // FIX: Wait for iframe to stabilize, not just fire once
     frame.onload = () => {
-      loading.style.display = "none";
+      setTimeout(() => {
+        loading.style.display = "none";
+      }, 600); // prevents instant disappearance
     };
 
     localStorage.setItem("lastPlayed", file);
