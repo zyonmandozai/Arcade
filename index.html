@@ -116,20 +116,19 @@
       transition: 0.3s ease;
     }
 
-    /* LOADING OVERLAY — ALWAYS ABOVE GAME WINDOW */
+    /* LOADING OVERLAY */
     #loading {
       display: none;
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.85);
-      padding: 25px 50px;
-      border-radius: 12px;
-      font-size: 28px;
+      background: rgba(0,0,0,0.75);
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-size: 26px;
       color: white;
-      z-index: 99999;
-      text-align: center;
+      z-index: 50;
     }
 
     /* MOBILE */
@@ -232,14 +231,31 @@
     const frame = document.getElementById("gameframe");
     const loading = document.getElementById("loading");
 
-    loading.style.display = "block";
-    frame.src = file;
+    // BALDI ONLY — 15 sec loader
+    if (file.includes("baldisbasics")) {
+      loading.style.display = "block";
 
-    // Force loader to stay for 11 seconds
-    setTimeout(() => {
+      let minTimeDone = false;
+      setTimeout(() => { minTimeDone = true; }, 15000);
+
+      frame.onload = () => {
+        if (minTimeDone) {
+          loading.style.display = "none";
+        } else {
+          const check = setInterval(() => {
+            if (minTimeDone) {
+              loading.style.display = "none";
+              clearInterval(check);
+            }
+          }, 200);
+        }
+      };
+    } else {
       loading.style.display = "none";
-    }, 15000);
+      frame.onload = null;
+    }
 
+    frame.src = file;
     localStorage.setItem("lastPlayed", file);
   }
 
