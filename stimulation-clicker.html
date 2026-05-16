@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simulation Clicker Deluxe</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #222 0, #050505 60%);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 10px;
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+    #subtitle {
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+    #bigNumber {
+      font-size: 48px;
+      margin: 20px 0 10px;
+    }
+    #perSecond {
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+    #clickButton {
+      padding: 18px 40px;
+      font-size: 22px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00ff99, #00b3ff);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0,255,180,0.6);
+      transition: transform 0.05s, box-shadow 0.1s;
+    }
+    #clickButton:active {
+      transform: scale(0.96);
+      box-shadow: 0 0 10px rgba(0,255,180,0.4);
+    }
+    .row {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 15px;
+      width: 260px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .card p {
+      margin: 4px 0;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+    .upgradeBtn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #222;
+      color: #fff;
+      font-size: 14px;
+      transition: 0.15s;
+    }
+    .upgradeBtn.affordable {
+      background: #00c853;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,200,83,0.6);
+    }
+    .upgradeBtn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+    }
+    .tag {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      opacity: 0.8;
+    }
+    #log {
+      margin-top: 25px;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 12px;
+      text-align: left;
+      padding-right: 5px;
+      opacity: 0.8;
+    }
+    .log-entry {
+      margin-bottom: 3px;
+    }
+    #particles {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .particle {
+      position: absolute;
+      font-size: 14px;
+      color: #00ffb3;
+      opacity: 0.9;
+      animation: floatUp 0.7s ease-out forwards;
+      text-shadow: 0 0 8px rgba(0,255,179,0.8);
+    }
+    @keyframes floatUp {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-40px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="particles"></div>
+<div class="container">
+  <h1>Simulation Clicker Deluxe</h1>
+  <div id="subtitle">Simulate everything. Break reality. The numbers are not supposed to go this high.</div>
+
+  <div id="bigNumber">0 simulations</div>
+  <div id="perSecond">0 / second</div>
+
+  <button id="clickButton">Simulate</button>
+
+  <div class="row">
+    <div class="card">
+      <span class="tag">Passive</span>
+      <h2>Auto Simulators</h2>
+      <p><b>Quantum Server</b> — runs simulations while you do nothing.</p>
+      <p>Owned: <span id="autoCount">0</span></p>
+      <p>+<span id="autoPower">1</span> / sec each</p>
+      <p>Cost: <span id="autoCost">25</span></p>
+      <button id="autoBtn" class="upgradeBtn">Buy Quantum Server</button>
+    </div>
+
+    <div class="card">
+      <span class="tag">Click</span>
+      <h2>Click Upgrades</h2>
+      <p><b>Hyper‑Optimized Algorithm</b> — each click simulates more.</p>
+      <p>Level: <span id="clickLevel">1</span></p>
+      <p>+<span id="clickPower">1</span> per click</p>
+      <p>Cost: <span id="clickCost">15</span></p>
+      <button id="clickBtn" class="upgradeBtn">Upgrade Clicks</button>
+    </div>
+
+    <div class="card">
+      <span class="tag">Chaos</span>
+      <h2>Reality Breakers</h2>
+      <p><b>Glitch the Universe</b> — random bursts of absurd simulations.</p>
+      <p>Chance: <span id="burstChance">3</span>% on click</p>
+      <p>Power: <span id="burstPower">50</span>x click</p>
+      <p>Cost: <span id="burstCost">120</span></p>
+      <button id="burstBtn" class="upgradeBtn">Upgrade Chaos</button>
+    </div>
+  </div>
+
+  <div id="log"></div>
+</div>
+
+<script>
+  let sims = 0;
+  let simsPerClick = 1;
+  let simsPerSecond = 0;
+
+  let autoCount = 0;
+  let autoBasePower = 1;
+  let autoCost = 25;
+
+  let clickLevel = 1;
+  let clickCost = 15;
+
+  let burstLevel = 0;
+  let burstChance = 3;
+  let burstPower = 50;
+  let burstCost = 120;
+
+  const bigNumber = document.getElementById('bigNumber');
+  const perSecond = document.getElementById('perSecond');
+  const clickButton = document.getElementById('clickButton');
+
+  const autoCountEl = document.getElementById('autoCount');
+  const autoPowerEl = document.getElementById('autoPower');
+  const autoCostEl = document.getElementById('autoCost');
+
+  const clickLevelEl = document.getElementById('clickLevel');
+  const clickPowerEl = document.getElementById('clickPower');
+  const clickCostEl = document.getElementById('clickCost');
+
+  const burstChanceEl = document.getElementById('burstChance');
+  const burstPowerEl = document.getElementById('burstPower');
+  const burstCostEl = document.getElementById('burstCost');
+
+  const autoBtn = document.getElementById('autoBtn');
+  const clickBtn = document.getElementById('clickBtn');
+  const burstBtn = document.getElementById('burstBtn');
+
+  const logEl = document.getElementById('log');
+  const particles = document.getElementById('particles');
+
+  function format(n) {
+    if (n < 1000) return n.toFixed(0);
+    const units = ['K','M','B','T','Q','Qi','Sx','Sp','Oc','No','De'];
+    let u = -1;
+    while (n >= 1000 && u < units.length - 1) {
+      n /= 1000;
+      u++;
+    }
+    return n.toFixed(2) + units[u];
+  }
+
+  function updateUI() {
+    bigNumber.textContent = format(sims) + ' simulations';
+    perSecond.textContent = format(simsPerSecond) + ' / second';
+
+    autoCountEl.textContent = autoCount;
+    autoPowerEl.textContent = autoBasePower;
+    autoCostEl.textContent = format(autoCost);
+
+    clickLevelEl.textContent = clickLevel;
+    clickPowerEl.textContent = simsPerClick;
+    clickCostEl.textContent = format(clickCost);
+
+    burstChanceEl.textContent = burstChance;
+    burstPowerEl.textContent = burstPower;
+    burstCostEl.textContent = format(burstCost);
+
+    setAffordable(autoBtn, sims >= autoCost);
+    setAffordable(clickBtn, sims >= clickCost);
+    setAffordable(burstBtn, sims >= burstCost);
+  }
+
+  function setAffordable(btn, ok) {
+    if (ok) {
+      btn.classList.add('affordable');
+      btn.disabled = false;
+    } else {
+      btn.classList.remove('affordable');
+      btn.disabled = false;
+    }
+  }
+
+  function addLog(msg) {
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.textContent = msg;
+    logEl.prepend(div);
+    const children = logEl.children;
+    if (children.length > 40) {
+      logEl.removeChild(children[children.length - 1]);
+    }
+  }
+
+  function spawnParticle(text) {
+    const span = document.createElement('span');
+    span.className = 'particle';
+    span.textContent = text;
+    const x = window.innerWidth / 2 + (Math.random() * 160 - 80);
+    const y = window.innerHeight / 2 + (Math.random() * 80 - 40);
+    span.style.left = x + 'px';
+    span.style.top = y + 'px';
+    particles.appendChild(span);
+    setTimeout(() => span.remove(), 700);
+  }
+
+  function doClick() {
+    let gain = simsPerClick;
+    let chaosTriggered = false;
+
+    if (burstLevel > 0) {
+      const roll = Math.random() * 100;
+      if (roll < burstChance) {
+        chaosTriggered = true;
+        const mult = burstPower;
+        gain *= mult;
+        addLog('⚠ Reality Glitch! x' + mult + ' simulations from one click.');
+        for (let i = 0; i < 6; i++) {
+          spawnParticle('+' + format(gain / 6));
+        }
+      }
+    }
+
+    sims += gain;
+    spawnParticle('+' + format(gain));
+    if (!chaosTriggered && gain > simsPerClick) {
+      addLog('Boosted click: ' + format(gain) + ' simulations.');
+    }
+    updateUI();
+  }
+
+  clickButton.addEventListener('click', doClick);
+
+  autoBtn.addEventListener('click', () => {
+    if (sims < autoCost) return;
+    sims -= autoCost;
+    autoCount++;
+    autoBasePower = Math.round(autoBasePower * 1.25 + 1);
+    autoCost = Math.round(autoCost * 1.9);
+    addLog('Bought Quantum Server #' + autoCount + '. Reality simulates itself now.');
+    recalcSPS();
+    updateUI();
+  });
+
+  clickBtn.addEventListener('click', () => {
+    if (sims < clickCost) return;
+    sims -= clickCost;
+    clickLevel++;
+    simsPerClick = Math.round(simsPerClick * 1.7 + 1);
+    clickCost = Math.round(clickCost * 2.1);
+    addLog('Upgraded click algorithm to level ' + clickLevel + '.');
+    updateUI();
+  });
+
+  burstBtn.addEventListener('click', () => {
+    if (sims < burstCost) return;
+    sims -= burstCost;
+    burstLevel++;
+    burstChance = Math.min(40, burstChance + 2);
+    burstPower = Math.round(burstPower * 1.4);
+    burstCost = Math.round(burstCost * 2.4);
+    addLog('Reality Breakers upgraded. Chaos level ' + burstLevel + '.');
+    updateUI();
+  });
+
+  function recalcSPS() {
+    simsPerSecond = autoCount * autoBasePower;
+  }
+
+  setInterval(() => {
+    if (simsPerSecond > 0) {
+      sims += simsPerSecond / 10;
+      if (Math.random() < 0.15 && simsPerSecond > 0) {
+        spawnParticle('+' + format(simsPerSecond / 10));
+      }
+      updateUI();
+    }
+  }, 100);
+
+  updateUI();
+</script>
+</body>
+</html>

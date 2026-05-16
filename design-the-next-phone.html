@@ -1,25 +1,503 @@
-<!-- design-the-next-iphone.html -->
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Design The Next iPhone - Embed</title>
-<style>
-html, body {
-margin: 0;
-padding: 0;
-height: 100%;
-overflow: hidden;
-background: #000;
-}
-iframe {
-border: none;
-width: 100%;
-height: 100%;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Design the Next Phone Deluxe</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #202020 0, #050505 60%);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    .wrapper {
+      display: flex;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 15px;
+      gap: 15px;
+    }
+    .left, .right {
+      background: rgba(0,0,0,0.4);
+      border-radius: 12px;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: 0 0 12px rgba(0,0,0,0.7);
+    }
+    .left {
+      flex: 0 0 320px;
+      overflow-y: auto;
+    }
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+    #modeTag {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    .sectionTitle {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.8;
+      text-transform: uppercase;
+    }
+    .optionRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0.8;
+      background: rgba(255,255,255,0.03);
+      transition: 0.15s;
+    }
+    .chip.selected {
+      background: #00e5ff;
+      color: #000;
+      border-color: #00e5ff;
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(0,229,255,0.7);
+    }
+    .colorRow {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .colorDot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4);
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .colorDot.selected {
+      border-color: #fff;
+      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    }
+    #phoneArea {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    #phone {
+      width: 220px;
+      height: 420px;
+      border-radius: 30px;
+      background: linear-gradient(145deg, #333, #111);
+      position: relative;
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+      overflow: hidden;
+    }
+    #phoneInner {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      right: 10px;
+      bottom: 10px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #222 0, #000 60%);
+    }
+    #cameraBlock {
+      position: absolute;
+      width: 70px;
+      height: 120px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.8);
+      top: 20px;
+      left: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      box-shadow: 0 0 12px rgba(0,0,0,0.9);
+    }
+    .lens {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #4af 0, #000 60%);
+      border: 2px solid #111;
+      box-shadow: 0 0 6px rgba(0,0,0,0.8);
+    }
+    #logo {
+      position: absolute;
+      bottom: 40px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 18px;
+      letter-spacing: 2px;
+      opacity: 0.8;
+    }
+    #specsPanel {
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    #ratingPanel {
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    #score {
+      font-size: 22px;
+    }
+    #judgeComment {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    #buildBtn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00ff99, #00b3ff);
+      color: #000;
+      font-size: 14px;
+      box-shadow: 0 0 16px rgba(0,255,180,0.7);
+      white-space: nowrap;
+    }
+    #modeButtons {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .modeBtn {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.03);
+      color: #fff;
+      font-size: 11px;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+    .modeBtn.active {
+      background: #ffea00;
+      color: #000;
+      border-color: #ffea00;
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(255,234,0,0.7);
+    }
+    @media (max-width: 900px) {
+      .wrapper {
+        flex-direction: column;
+      }
+      .left {
+        flex: 0 0 auto;
+        max-height: 45vh;
+      }
+    }
+  </style>
 </head>
 <body>
-<iframe src="https://neal.fun/design-the-next-iphone/"></iframe>
+<div class="wrapper">
+  <div class="left">
+    <h1>Design the Next Phone</h1>
+    <div id="modeTag">Mode: Realistic + Fun + Competitive</div>
+
+    <div id="modeButtons">
+      <button class="modeBtn active" data-mode="real">Realistic</button>
+      <button class="modeBtn" data-mode="fun">Chaos</button>
+      <button class="modeBtn" data-mode="comp">Competitive</button>
+    </div>
+
+    <div class="sectionTitle">Brand</div>
+    <div class="optionRow" id="brandRow">
+      <div class="chip" data-brand="Zyon">Zyon</div>
+      <div class="chip" data-brand="Orbyte">Orbyte</div>
+      <div class="chip" data-brand="Nova">Nova</div>
+      <div class="chip" data-brand="Void">Void</div>
+    </div>
+
+    <div class="sectionTitle">Camera Setup</div>
+    <div class="optionRow" id="cameraRow">
+      <div class="chip" data-cam="1">Single</div>
+      <div class="chip" data-cam="2">Dual</div>
+      <div class="chip" data-cam="3">Triple</div>
+      <div class="chip" data-cam="4">Quad</div>
+    </div>
+
+    <div class="sectionTitle">Back Color</div>
+    <div class="colorRow" id="colorRow">
+      <div class="colorDot" data-color="#111111" style="background:#111111;"></div>
+      <div class="colorDot" data-color="#1e88e5" style="background:#1e88e5;"></div>
+      <div class="colorDot" data-color="#43a047" style="background:#43a047;"></div>
+      <div class="colorDot" data-color="#e53935" style="background:#e53935;"></div>
+      <div class="colorDot" data-color="#ffb300" style="background:#ffb300;"></div>
+      <div class="colorDot" data-color="#9c27b0" style="background:#9c27b0;"></div>
+    </div>
+
+    <div class="sectionTitle">Special Features</div>
+    <div class="optionRow" id="featureRow">
+      <div class="chip" data-feature="fold">Foldable</div>
+      <div class="chip" data-feature="rgb">RGB Back</div>
+      <div class="chip" data-feature="holo">Hologram Mode</div>
+      <div class="chip" data-feature="sat">Satellite</div>
+      <div class="chip" data-feature="bat">Insane Battery</div>
+      <div class="chip" data-feature="cam">Periscope Zoom</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div id="phoneArea">
+      <div id="phone">
+        <div id="phoneInner"></div>
+        <div id="cameraBlock"></div>
+        <div id="logo">ZYON</div>
+      </div>
+    </div>
+
+    <div id="specsPanel">
+      <b>Specs</b>
+      <div id="specsText"></div>
+    </div>
+
+    <div id="ratingPanel">
+      <div>
+        <div><b>Judge Score</b></div>
+        <div id="score">– / 100</div>
+      </div>
+      <div id="judgeComment">Design your phone, then click "Ship This Phone" to get judged.</div>
+      <button id="buildBtn">Ship This Phone</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const brandRow = document.getElementById('brandRow');
+  const cameraRow = document.getElementById('cameraRow');
+  const colorRow = document.getElementById('colorRow');
+  const featureRow = document.getElementById('featureRow');
+
+  const phone = document.getElementById('phone');
+  const phoneInner = document.getElementById('phoneInner');
+  const cameraBlock = document.getElementById('cameraBlock');
+  const logo = document.getElementById('logo');
+
+  const specsText = document.getElementById('specsText');
+  const scoreEl = document.getElementById('score');
+  const judgeComment = document.getElementById('judgeComment');
+  const buildBtn = document.getElementById('buildBtn');
+  const modeButtons = document.querySelectorAll('.modeBtn');
+  const modeTag = document.getElementById('modeTag');
+
+  let state = {
+    brand: 'Zyon',
+    cameras: 2,
+    color: '#1e88e5',
+    features: new Set(),
+    mode: 'real'
+  };
+
+  function selectChip(container, chip) {
+    container.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+  }
+
+  function toggleFeatureChip(chip) {
+    chip.classList.toggle('selected');
+  }
+
+  function selectColorDot(dot) {
+    colorRow.querySelectorAll('.colorDot').forEach(d => d.classList.remove('selected'));
+    dot.classList.add('selected');
+  }
+
+  brandRow.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    state.brand = chip.dataset.brand;
+    selectChip(brandRow, chip);
+    updatePhone();
+  });
+
+  cameraRow.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    state.cameras = parseInt(chip.dataset.cam, 10);
+    selectChip(cameraRow, chip);
+    updatePhone();
+  });
+
+  colorRow.addEventListener('click', e => {
+    const dot = e.target.closest('.colorDot');
+    if (!dot) return;
+    state.color = dot.dataset.color;
+    selectColorDot(dot);
+    updatePhone();
+  });
+
+  featureRow.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const key = chip.dataset.feature;
+    if (state.features.has(key)) {
+      state.features.delete(key);
+    } else {
+      state.features.add(key);
+    }
+    toggleFeatureChip(chip);
+    updatePhone();
+  });
+
+  modeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.mode = btn.dataset.mode;
+      if (state.mode === 'real') {
+        modeTag.textContent = 'Mode: Realistic — judges care about balance and practicality.';
+      } else if (state.mode === 'fun') {
+        modeTag.textContent = 'Mode: Chaos — judges reward ridiculous, over-the-top designs.';
+      } else {
+        modeTag.textContent = 'Mode: Competitive — smart tradeoffs and synergy score highest.';
+      }
+    });
+  });
+
+  function updatePhone() {
+    phone.style.background = `linear-gradient(145deg, ${state.color}, #000)`;
+    logo.textContent = state.brand.toUpperCase();
+
+    cameraBlock.innerHTML = '';
+    const count = state.cameras;
+    for (let i = 0; i < count; i++) {
+      const lens = document.createElement('div');
+      lens.className = 'lens';
+      cameraBlock.appendChild(lens);
+    }
+
+    const specs = [];
+    specs.push('Brand: ' + state.brand);
+    specs.push('Camera setup: ' + state.cameras + ' lens' + (state.cameras > 1 ? 'es' : ''));
+    specs.push('Color: ' + state.color.toUpperCase());
+    if (state.features.size === 0) {
+      specs.push('Special: None yet. Add something wild.');
+    } else {
+      const names = [];
+      if (state.features.has('fold')) names.push('Foldable display');
+      if (state.features.has('rgb')) names.push('RGB back panel');
+      if (state.features.has('holo')) names.push('Hologram projection');
+      if (state.features.has('sat')) names.push('Satellite connectivity');
+      if (state.features.has('bat')) names.push('Ridiculous battery');
+      if (state.features.has('cam')) names.push('Periscope zoom');
+      specs.push('Special: ' + names.join(', '));
+    }
+    specsText.innerHTML = specs.map(s => '• ' + s).join('<br>');
+  }
+
+  function judgePhone() {
+    let base = 50;
+
+    if (state.cameras === 1) base += 5;
+    if (state.cameras === 2) base += 10;
+    if (state.cameras === 3) base += 18;
+    if (state.cameras === 4) base += 15;
+
+    const f = state.features;
+    const count = f.size;
+
+    if (state.mode === 'real') {
+      if (count === 0) base -= 5;
+      if (count === 1 || count === 2) base += 10;
+      if (count === 3) base += 5;
+      if (count > 3) base -= 8;
+
+      if (f.has('bat')) base += 8;
+      if (f.has('sat')) base += 5;
+      if (f.has('holo')) base -= 3;
+      if (f.has('rgb')) base -= 2;
+    } else if (state.mode === 'fun') {
+      base = 40;
+      base += count * 8;
+      if (f.has('rgb')) base += 10;
+      if (f.has('holo')) base += 10;
+      if (f.has('fold')) base += 6;
+      if (f.has('sat')) base += 4;
+      if (f.has('bat')) base += 4;
+      if (count >= 4) base += 6;
+    } else {
+      base = 45;
+      if (f.has('fold') && f.has('bat')) base += 12;
+      if (f.has('sat') && f.has('bat')) base += 8;
+      if (f.has('cam') && state.cameras >= 3) base += 10;
+      if (count === 2 || count === 3) base += 10;
+      if (count === 4) base += 6;
+      if (count > 4) base -= 6;
+    }
+
+    if (state.brand === 'Zyon') base += 3;
+    if (state.brand === 'Void' && state.mode === 'fun') base += 4;
+
+    base += Math.random() * 8 - 4;
+    base = Math.max(0, Math.min(100, Math.round(base)));
+
+    scoreEl.textContent = base + ' / 100';
+
+    let comment = '';
+    if (base >= 90) {
+      comment = 'This phone breaks the market. People will camp outside stores for this.';
+    } else if (base >= 80) {
+      comment = 'Very strong design. Tech reviewers will love this.';
+    } else if (base >= 70) {
+      comment = 'Solid phone. A few weird choices, but it works.';
+    } else if (base >= 60) {
+      comment = 'Not bad, but the judges are confused about your priorities.';
+    } else if (base >= 50) {
+      comment = 'It works, but nobody is lining up for this.';
+    } else if (base >= 40) {
+      comment = 'This feels like three different phones glued together.';
+    } else {
+      comment = 'The judges are concerned. And also slightly afraid.';
+    }
+
+    if (state.mode === 'fun' && state.features.size >= 4) {
+      comment += ' Chaos mode bonus: this thing is absolutely unhinged.';
+    }
+    if (state.mode === 'comp' && base >= 80) {
+      comment += ' Competitive mode: your tradeoffs are actually genius.';
+    }
+
+    judgeComment.textContent = comment;
+  }
+
+  buildBtn.addEventListener('click', judgePhone);
+
+  (function init() {
+    brandRow.querySelector('[data-brand="Zyon"]').classList.add('selected');
+    cameraRow.querySelector('[data-cam="2"]').classList.add('selected');
+    colorRow.querySelector('[data-color="#1e88e5"]').classList.add('selected');
+    updatePhone();
+  })();
+</script>
 </body>
 </html>
