@@ -116,7 +116,7 @@
       transition: 0.3s ease;
     }
 
-    /* LOADING OVERLAY — FIXED */
+    /* LOADING OVERLAY — ALWAYS ABOVE GAME WINDOW */
     #loading {
       display: none;
       position: absolute;
@@ -128,7 +128,7 @@
       border-radius: 12px;
       font-size: 28px;
       color: white;
-      z-index: 9999;
+      z-index: 99999;
       text-align: center;
     }
 
@@ -235,12 +235,10 @@
     loading.style.display = "block";
     frame.src = file;
 
-    // FIX: Wait for iframe to stabilize, not just fire once
-    frame.onload = () => {
-      setTimeout(() => {
-        loading.style.display = "none";
-      }, 600); // prevents instant disappearance
-    };
+    // Force loader to stay for 11 seconds
+    setTimeout(() => {
+      loading.style.display = "none";
+    }, 11000);
 
     localStorage.setItem("lastPlayed", file);
   }
