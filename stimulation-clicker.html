@@ -229,6 +229,9 @@
   const logEl = document.getElementById('log');
   const particles = document.getElementById('particles');
 
+  let spaceHeld = false;
+  let spaceInterval = null;
+
   function format(n) {
     if (n < 1000) return n.toFixed(0);
     const units = ['K','M','B','T','Q','Qi','Sx','Sp','Oc','No','De'];
@@ -320,6 +323,30 @@
   }
 
   clickButton.addEventListener('click', doClick);
+
+  // SPACEBAR HOLD SUPPORT
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!spaceHeld) {
+        spaceHeld = true;
+        // fire once instantly
+        doClick();
+        // then repeat at a fast, smooth rate
+        spaceInterval = setInterval(doClick, 40);
+      }
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+      spaceHeld = false;
+      if (spaceInterval) {
+        clearInterval(spaceInterval);
+        spaceInterval = null;
+      }
+    }
+  });
 
   autoBtn.addEventListener('click', () => {
     if (sims < autoCost) return;

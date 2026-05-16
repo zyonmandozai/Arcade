@@ -232,10 +232,10 @@
 
     <div class="sectionTitle">Brand</div>
     <div class="optionRow" id="brandRow">
-      <div class="chip" data-brand="Zyon">Zyon</div>
-      <div class="chip" data-brand="Orbyte">Orbyte</div>
       <div class="chip" data-brand="Nova">Nova</div>
+      <div class="chip" data-brand="Orbyte">Orbyte</div>
       <div class="chip" data-brand="Void">Void</div>
+      <div class="chip" data-brand="Flux">Flux</div>
     </div>
 
     <div class="sectionTitle">Camera Setup</div>
@@ -272,7 +272,7 @@
       <div id="phone">
         <div id="phoneInner"></div>
         <div id="cameraBlock"></div>
-        <div id="logo">ZYON</div>
+        <div id="logo">NOVA</div>
       </div>
     </div>
 
@@ -311,7 +311,7 @@
   const modeTag = document.getElementById('modeTag');
 
   let state = {
-    brand: 'Zyon',
+    brand: 'Nova',
     cameras: 2,
     color: '#1e88e5',
     features: new Set(),
@@ -455,7 +455,6 @@
       if (count > 4) base -= 6;
     }
 
-    if (state.brand === 'Zyon') base += 3;
     if (state.brand === 'Void' && state.mode === 'fun') base += 4;
 
     base += Math.random() * 8 - 4;
@@ -493,7 +492,7 @@
   buildBtn.addEventListener('click', judgePhone);
 
   (function init() {
-    brandRow.querySelector('[data-brand="Zyon"]').classList.add('selected');
+    brandRow.querySelector('[data-brand="Nova"]').classList.add('selected');
     cameraRow.querySelector('[data-cam="2"]').classList.add('selected');
     colorRow.querySelector('[data-color="#1e88e5"]').classList.add('selected');
     updatePhone();
