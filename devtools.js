@@ -1,4 +1,4 @@
-import { onUsersUpdate, sessionID } from "./firebase.js";
+import { onUsersUpdate } from "./firebase.js";
 
 let devMode = false;
 let panel, watermark;
@@ -52,18 +52,19 @@ function createDevPanel() {
     if (dragging) {
       panel.style.left = e.clientX - offsetX + "px";
       panel.style.top = e.clientY - offsetY + "px";
+      panel.style.transform = ""; // stop centering once moved
     }
   });
 }
 
 // ------------------------------
-// Watermark
+// Watermark (bottom-left)
 // ------------------------------
 function createWatermark() {
   watermark = document.createElement("div");
   watermark.textContent = "DEV MODE ACTIVE";
   watermark.style.position = "fixed";
-  watermark.style.top = "10px";
+  watermark.style.bottom = "10px";
   watermark.style.left = "10px";
   watermark.style.color = "#00eaff";
   watermark.style.fontFamily = "Consolas";
@@ -76,22 +77,39 @@ function createWatermark() {
 }
 
 // ------------------------------
-// Activate Dev Mode
+// Show / Hide Dev Mode
 // ------------------------------
-function activateDevMode() {
+function showDevMode() {
   devMode = true;
-  panel.style.display = "block";
-  watermark.style.display = "block";
+  if (panel) panel.style.display = "block";
+  if (watermark) watermark.style.display = "block";
+}
+
+function hideDevMode() {
+  devMode = false;
+  if (panel) panel.style.display = "none";
+  if (watermark) watermark.style.display = "none";
 }
 
 // ------------------------------
-// Listen for Key Combo
+// Toggle with CTRL+ALT+SHIFT+D
 // ------------------------------
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === "d") {
     const iframe = document.querySelector("iframe");
-    if (!iframe || iframe.src === "" || iframe.src === "about:blank") {
-      activateDevMode();
+    const blank =
+      !iframe ||
+      iframe.src === "" ||
+      iframe.src === "about:blank" ||
+      iframe.src.endsWith("about:blank");
+
+    // Only allow dev mode when no game is loaded
+    if (!blank) return;
+
+    if (devMode) {
+      hideDevMode();
+    } else {
+      showDevMode();
     }
   }
 });
@@ -99,24 +117,27 @@ document.addEventListener("keydown", (e) => {
 // ------------------------------
 // Realtime User Updates
 // ------------------------------
-onUsersUpdate((users) => {
-  if (!panel) return;
+function setupUserListener() {
   const box = document.getElementById("devUsers");
-  let out = "ACTIVE USERS:\n\n";
+  if (!box) return;
 
-  const keys = Object.keys(users);
-  out += `Total: ${keys.length}\n\n`;
+  onUsersUpdate((users) => {
+    let out = "ACTIVE USERS:\n\n";
+    const keys = Object.keys(users || {});
+    out += `Total: ${keys.length}\n\n`;
 
-  keys.forEach(id => {
-    const u = users[id];
-    out += `${id} — ${u.game} — ${u.os} — ${u.browser} — ${u.screenSize}\n`;
+    keys.forEach((id) => {
+      const u = users[id];
+      out += `${id} — ${u.game} — ${u.os} — ${u.browser} — ${u.screenSize}\n`;
+    });
+
+    box.textContent = out;
   });
-
-  box.textContent = out;
-});
+}
 
 // ------------------------------
 // Init
 // ------------------------------
 createDevPanel();
 createWatermark();
+setupUserListener();
