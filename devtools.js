@@ -52,14 +52,15 @@ function createDevPanel() {
   document.body.appendChild(panel);
 
   // ------------------------------
-  // PERFECT DRAGGING LOGIC
+  // PERFECT DRAGGING USING POINTER EVENTS
   // ------------------------------
   let dragging = false;
   let startX = 0, startY = 0;
   let startLeft = 0, startTop = 0;
 
-  dragBar.addEventListener("mousedown", (e) => {
+  dragBar.addEventListener("pointerdown", (e) => {
     dragging = true;
+    dragBar.setPointerCapture(e.pointerId);
     dragBar.style.cursor = "grabbing";
 
     startX = e.clientX;
@@ -68,15 +69,16 @@ function createDevPanel() {
     startLeft = panel.offsetLeft;
     startTop = panel.offsetTop;
 
-    panel.style.transform = "";
+    panel.style.transform = ""; // stop centering after first drag
   });
 
-  document.addEventListener("mouseup", () => {
+  dragBar.addEventListener("pointerup", (e) => {
     dragging = false;
+    dragBar.releasePointerCapture(e.pointerId);
     dragBar.style.cursor = "grab";
   });
 
-  document.addEventListener("mousemove", (e) => {
+  dragBar.addEventListener("pointermove", (e) => {
     if (!dragging) return;
 
     const dx = e.clientX - startX;
@@ -134,12 +136,11 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ------------------------------
-// Realtime User Updates (FIXED)
+// Realtime User Updates
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
 
-  // Wait until Firebase is ready
   setTimeout(() => {
     onUsersUpdate((users) => {
       let out = "ACTIVE USERS:\n\n";
@@ -153,7 +154,7 @@ function setupUserListener() {
 
       box.textContent = out;
     });
-  }, 300); // delay ensures Firebase is initialized
+  }, 300);
 }
 
 // ------------------------------
