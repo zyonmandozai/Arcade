@@ -13,11 +13,11 @@ function createDevPanel() {
   panel.style.left = "50%";
   panel.style.top = "50%";
   panel.style.transform = "translate(-50%, -50%)";
-  panel.style.width = "600px";       // BIGGER PANEL
-  panel.style.height = "600px";      // BIGGER PANEL
+  panel.style.width = "620px";
+  panel.style.height = "640px";
   panel.style.background = "rgba(0,0,0,0.85)";
   panel.style.border = "2px solid #00eaff";
-  panel.style.boxShadow = "0 0 20px #00eaff";
+  panel.style.boxShadow = "0 0 25px #00eaff";
   panel.style.borderRadius = "12px";
   panel.style.color = "#00ffea";
   panel.style.fontFamily = "Consolas, monospace";
@@ -27,6 +27,7 @@ function createDevPanel() {
   panel.style.display = "none";
   panel.style.overflow = "hidden";
   panel.style.resize = "none";
+  panel.style.boxSizing = "border-box";
 
   // Drag bar
   dragBar = document.createElement("div");
@@ -45,7 +46,7 @@ function createDevPanel() {
   content.id = "devUsers";
   content.style.whiteSpace = "pre";
   content.style.padding = "10px";
-  content.style.height = "calc(100% - 150px)";
+  content.style.height = "calc(100% - 190px)";
   content.style.overflowY = "auto";
   content.textContent = "Loading users...";
 
@@ -53,10 +54,12 @@ function createDevPanel() {
   const graphArea = document.createElement("div");
   graphArea.id = "devGraphs";
   graphArea.style.whiteSpace = "pre";
-  graphArea.style.padding = "10px";
-  graphArea.style.height = "150px";
+  graphArea.style.padding = "10px 10px 25px 10px";
+  graphArea.style.height = "190px";
   graphArea.style.borderTop = "1px solid #00eaff";
   graphArea.style.overflowY = "auto";
+  graphArea.style.background = "rgba(0,0,0,0.4)";
+  graphArea.style.textShadow = "0 0 5px #00eaff";
   graphArea.textContent = "Graphs loading...";
 
   panel.appendChild(dragBar);
@@ -198,10 +201,8 @@ function setupUserListener() {
 
       keys.forEach((id) => {
         const u = users[id];
-
         if (!osCounts[u.os]) osCounts[u.os] = 0;
         osCounts[u.os]++;
-
         if (!deviceCounts[u.deviceType]) deviceCounts[u.deviceType] = 0;
         deviceCounts[u.deviceType]++;
       });
@@ -222,7 +223,6 @@ function setupUserListener() {
       // 4. WHO'S PLAYING WHAT
       // ------------------------------
       const gamePlayers = {};
-
       keys.forEach((id) => {
         const g = users[id].game || "none";
         if (!gamePlayers[g]) gamePlayers[g] = [];
@@ -243,7 +243,6 @@ function setupUserListener() {
       // GRAPHS
       // ------------------------------
       let graphOut = "";
-
       const maxGame = Math.max(...Object.values(gameCounts), 1);
       const maxOS = Math.max(...Object.values(osCounts), 1);
       const maxDevice = Math.max(...Object.values(deviceCounts), 1);
