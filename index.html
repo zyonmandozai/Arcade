@@ -161,9 +161,13 @@
 </div>
 
 <script type="module">
-  import { registerUser, updateGame } from "./firebase.js";
+  import { registerUser, updateGame, checkBanOnLoad } from "./firebase.js";
   import "./devtools.js";
 
+  // BAN CHECK FIRST
+  checkBanOnLoad();
+
+  // REGISTER USER
   registerUser();
 
   const frame = document.getElementById("gameFrame");
