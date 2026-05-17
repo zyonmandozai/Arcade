@@ -13,8 +13,8 @@ function createDevPanel() {
   panel.style.left = "50%";
   panel.style.top = "50%";
   panel.style.transform = "translate(-50%, -50%)";
-  panel.style.width = "420px";
-  panel.style.height = "420px";
+  panel.style.width = "600px";       // BIGGER PANEL
+  panel.style.height = "600px";      // BIGGER PANEL
   panel.style.background = "rgba(0,0,0,0.85)";
   panel.style.border = "2px solid #00eaff";
   panel.style.boxShadow = "0 0 20px #00eaff";
@@ -40,16 +40,28 @@ function createDevPanel() {
   dragBar.style.paddingLeft = "10px";
   dragBar.textContent = "DEV CONSOLE";
 
+  // Content area
   const content = document.createElement("div");
   content.id = "devUsers";
   content.style.whiteSpace = "pre";
   content.style.padding = "10px";
-  content.style.height = "calc(100% - 32px)";
+  content.style.height = "calc(100% - 150px)";
   content.style.overflowY = "auto";
   content.textContent = "Loading users...";
 
+  // Graph area
+  const graphArea = document.createElement("div");
+  graphArea.id = "devGraphs";
+  graphArea.style.whiteSpace = "pre";
+  graphArea.style.padding = "10px";
+  graphArea.style.height = "150px";
+  graphArea.style.borderTop = "1px solid #00eaff";
+  graphArea.style.overflowY = "auto";
+  graphArea.textContent = "Graphs loading...";
+
   panel.appendChild(dragBar);
   panel.appendChild(content);
+  panel.appendChild(graphArea);
   document.body.appendChild(panel);
 
   // ------------------------------
@@ -70,7 +82,7 @@ function createDevPanel() {
     startLeft = panel.offsetLeft;
     startTop = panel.offsetTop;
 
-    panel.style.transform = ""; // stop centering after first drag
+    panel.style.transform = "";
   });
 
   dragBar.addEventListener("pointerup", (e) => {
@@ -137,10 +149,19 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ------------------------------
-// Realtime User Updates (Analytics)
+// ASCII BAR GRAPH HELPER
+// ------------------------------
+function makeBar(count, max) {
+  const barLength = Math.floor((count / max) * 30);
+  return "█".repeat(barLength) + " ".repeat(30 - barLength);
+}
+
+// ------------------------------
+// Realtime User Updates (Analytics + Graphs)
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
+  const graphBox = document.getElementById("devGraphs");
 
   setTimeout(() => {
     onUsersUpdate((users) => {
@@ -216,10 +237,33 @@ function setupUserListener() {
         });
       });
 
-      // ------------------------------
-      // Write to panel
-      // ------------------------------
       box.textContent = out;
+
+      // ------------------------------
+      // GRAPHS
+      // ------------------------------
+      let graphOut = "";
+
+      const maxGame = Math.max(...Object.values(gameCounts), 1);
+      const maxOS = Math.max(...Object.values(osCounts), 1);
+      const maxDevice = Math.max(...Object.values(deviceCounts), 1);
+
+      graphOut += "GAME POPULARITY\n";
+      Object.keys(gameCounts).forEach((g) => {
+        graphOut += `${g.padEnd(15)} ${makeBar(gameCounts[g], maxGame)} ${gameCounts[g]}\n`;
+      });
+
+      graphOut += "\nOS BREAKDOWN\n";
+      Object.keys(osCounts).forEach((os) => {
+        graphOut += `${os.padEnd(15)} ${makeBar(osCounts[os], maxOS)} ${osCounts[os]}\n`;
+      });
+
+      graphOut += "\nDEVICE TYPE\n";
+      Object.keys(deviceCounts).forEach((d) => {
+        graphOut += `${d.padEnd(15)} ${makeBar(deviceCounts[d], maxDevice)} ${deviceCounts[d]}\n`;
+      });
+
+      graphBox.textContent = graphOut;
     });
   }, 500);
 }
