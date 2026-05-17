@@ -25,16 +25,16 @@ function createDevPanel() {
   panel.style.padding = "0";
   panel.style.zIndex = "999999";
   panel.style.display = "none";
-  panel.style.resize = "both";
-  panel.style.overflow = "auto";
+  panel.style.overflow = "hidden";
+  panel.style.resize = "none";
 
-  // Drag bar (only this moves the panel)
+  // Drag bar
   dragBar = document.createElement("div");
   dragBar.style.width = "100%";
   dragBar.style.height = "32px";
   dragBar.style.background = "rgba(0,0,0,0.6)";
   dragBar.style.borderBottom = "1px solid #00eaff";
-  dragBar.style.cursor = "move";
+  dragBar.style.cursor = "grab";
   dragBar.style.display = "flex";
   dragBar.style.alignItems = "center";
   dragBar.style.paddingLeft = "10px";
@@ -51,24 +51,39 @@ function createDevPanel() {
   panel.appendChild(content);
   document.body.appendChild(panel);
 
-  // Dragging logic
+  // ------------------------------
+  // PERFECT DRAGGING LOGIC
+  // ------------------------------
   let dragging = false;
-  let offsetX = 0, offsetY = 0;
+  let startX = 0, startY = 0;
+  let startLeft = 0, startTop = 0;
 
   dragBar.addEventListener("mousedown", (e) => {
     dragging = true;
-    offsetX = e.clientX - panel.offsetLeft;
-    offsetY = e.clientY - panel.offsetTop;
-    panel.style.transform = ""; // stop centering
+    dragBar.style.cursor = "grabbing";
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+    startLeft = panel.offsetLeft;
+    startTop = panel.offsetTop;
+
+    panel.style.transform = "";
   });
 
-  document.addEventListener("mouseup", () => dragging = false);
+  document.addEventListener("mouseup", () => {
+    dragging = false;
+    dragBar.style.cursor = "grab";
+  });
 
   document.addEventListener("mousemove", (e) => {
-    if (dragging) {
-      panel.style.left = e.clientX - offsetX + "px";
-      panel.style.top = e.clientY - offsetY + "px";
-    }
+    if (!dragging) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    panel.style.left = startLeft + dx + "px";
+    panel.style.top = startTop + dy + "px";
   });
 }
 
@@ -112,30 +127,33 @@ document.addEventListener("keydown", (e) => {
       iframe.src === "about:blank" ||
       iframe.src.endsWith("about:blank");
 
-    if (!blank) return; // only when no game is loaded
+    if (!blank) return;
 
     toggleDevMode();
   }
 });
 
 // ------------------------------
-// Realtime User Updates
+// Realtime User Updates (FIXED)
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
 
-  onUsersUpdate((users) => {
-    let out = "ACTIVE USERS:\n\n";
-    const keys = Object.keys(users || {});
-    out += `Total: ${keys.length}\n\n`;
+  // Wait until Firebase is ready
+  setTimeout(() => {
+    onUsersUpdate((users) => {
+      let out = "ACTIVE USERS:\n\n";
+      const keys = Object.keys(users || {});
+      out += `Total: ${keys.length}\n\n`;
 
-    keys.forEach((id) => {
-      const u = users[id];
-      out += `${id} — ${u.game} — ${u.os} — ${u.browser} — ${u.screenSize}\n`;
+      keys.forEach((id) => {
+        const u = users[id];
+        out += `${id} — ${u.game} — ${u.os} — ${u.browser} — ${u.screenSize}\n`;
+      });
+
+      box.textContent = out;
     });
-
-    box.textContent = out;
-  });
+  }, 300); // delay ensures Firebase is initialized
 }
 
 // ------------------------------
