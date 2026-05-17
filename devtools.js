@@ -14,7 +14,7 @@ function createDevPanel() {
   panel.style.top = "50%";
   panel.style.transform = "translate(-50%, -50%)";
   panel.style.width = "420px";
-  panel.style.height = "380px";
+  panel.style.height = "420px";
   panel.style.background = "rgba(0,0,0,0.85)";
   panel.style.border = "2px solid #00eaff";
   panel.style.boxShadow = "0 0 20px #00eaff";
@@ -137,29 +137,88 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ------------------------------
-// Realtime User Updates (WORKING)
+// Realtime User Updates (Analytics)
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
 
-  // Wait for Firebase to be ready
   setTimeout(() => {
     onUsersUpdate((users) => {
-      let out = "ACTIVE USERS\n\n";
-
       const keys = Object.keys(users || {});
+      let out = "";
+
+      // ------------------------------
+      // 1. ACTIVE USERS
+      // ------------------------------
+      out += "ACTIVE USERS\n\n";
       out += `Total: ${keys.length}\n\n`;
+
+      // ------------------------------
+      // 2. GAME COUNTS
+      // ------------------------------
+      const gameCounts = {};
+      keys.forEach((id) => {
+        const g = users[id].game || "none";
+        if (!gameCounts[g]) gameCounts[g] = 0;
+        gameCounts[g]++;
+      });
+
+      out += "GAME COUNTS\n";
+      Object.keys(gameCounts).forEach((g) => {
+        out += `  ${g}: ${gameCounts[g]}\n`;
+      });
+      out += "\n";
+
+      // ------------------------------
+      // 3. DEVICE BREAKDOWN
+      // ------------------------------
+      const osCounts = {};
+      const deviceCounts = {};
 
       keys.forEach((id) => {
         const u = users[id];
-        out += `${id}\n`;
-        out += `  Game: ${u.game}\n`;
-        out += `  OS: ${u.os}\n`;
-        out += `  Browser: ${u.browser}\n`;
-        out += `  Screen: ${u.screenSize}\n`;
-        out += `\n`;
+
+        if (!osCounts[u.os]) osCounts[u.os] = 0;
+        osCounts[u.os]++;
+
+        if (!deviceCounts[u.deviceType]) deviceCounts[u.deviceType] = 0;
+        deviceCounts[u.deviceType]++;
       });
 
+      out += "DEVICE BREAKDOWN\n";
+      Object.keys(osCounts).forEach((os) => {
+        out += `  ${os}: ${osCounts[os]}\n`;
+      });
+      out += "\n";
+
+      out += "DEVICE TYPE\n";
+      Object.keys(deviceCounts).forEach((d) => {
+        out += `  ${d}: ${deviceCounts[d]}\n`;
+      });
+      out += "\n";
+
+      // ------------------------------
+      // 4. WHO'S PLAYING WHAT
+      // ------------------------------
+      const gamePlayers = {};
+
+      keys.forEach((id) => {
+        const g = users[id].game || "none";
+        if (!gamePlayers[g]) gamePlayers[g] = [];
+        gamePlayers[g].push(id);
+      });
+
+      out += "WHO'S PLAYING WHAT\n";
+      Object.keys(gamePlayers).forEach((g) => {
+        out += `\n${g}:\n`;
+        gamePlayers[g].forEach((id) => {
+          out += `  - ${id}\n`;
+        });
+      });
+
+      // ------------------------------
+      // Write to panel
+      // ------------------------------
       box.textContent = out;
     });
   }, 500);
