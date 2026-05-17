@@ -1,7 +1,7 @@
 import { onUsersUpdate } from "./firebase.js";
 
 let devMode = false;
-let panel, watermark;
+let panel, watermark, dragBar;
 
 // ------------------------------
 // Create Dev Panel UI
@@ -22,28 +22,44 @@ function createDevPanel() {
   panel.style.color = "#00ffea";
   panel.style.fontFamily = "Consolas, monospace";
   panel.style.fontSize = "13px";
-  panel.style.padding = "12px";
+  panel.style.padding = "0";
   panel.style.zIndex = "999999";
   panel.style.display = "none";
   panel.style.resize = "both";
   panel.style.overflow = "auto";
-  panel.style.cursor = "move";
 
-  panel.innerHTML = `
-    <div style="font-size:16px;margin-bottom:8px;">DEV CONSOLE</div>
-    <div id="devUsers" style="white-space:pre;overflow-y:auto;height:300px;"></div>
-  `;
+  // Drag bar (only this moves the panel)
+  dragBar = document.createElement("div");
+  dragBar.style.width = "100%";
+  dragBar.style.height = "32px";
+  dragBar.style.background = "rgba(0,0,0,0.6)";
+  dragBar.style.borderBottom = "1px solid #00eaff";
+  dragBar.style.cursor = "move";
+  dragBar.style.display = "flex";
+  dragBar.style.alignItems = "center";
+  dragBar.style.paddingLeft = "10px";
+  dragBar.textContent = "DEV CONSOLE";
 
+  const content = document.createElement("div");
+  content.id = "devUsers";
+  content.style.whiteSpace = "pre";
+  content.style.padding = "10px";
+  content.style.height = "calc(100% - 32px)";
+  content.style.overflowY = "auto";
+
+  panel.appendChild(dragBar);
+  panel.appendChild(content);
   document.body.appendChild(panel);
 
-  // Dragging
+  // Dragging logic
   let dragging = false;
-  let offsetX, offsetY;
+  let offsetX = 0, offsetY = 0;
 
-  panel.addEventListener("mousedown", (e) => {
+  dragBar.addEventListener("mousedown", (e) => {
     dragging = true;
     offsetX = e.clientX - panel.offsetLeft;
     offsetY = e.clientY - panel.offsetTop;
+    panel.style.transform = ""; // stop centering
   });
 
   document.addEventListener("mouseup", () => dragging = false);
@@ -52,7 +68,6 @@ function createDevPanel() {
     if (dragging) {
       panel.style.left = e.clientX - offsetX + "px";
       panel.style.top = e.clientY - offsetY + "px";
-      panel.style.transform = ""; // stop centering once moved
     }
   });
 }
@@ -77,22 +92,16 @@ function createWatermark() {
 }
 
 // ------------------------------
-// Show / Hide Dev Mode
+// Toggle Dev Mode
 // ------------------------------
-function showDevMode() {
-  devMode = true;
-  if (panel) panel.style.display = "block";
-  if (watermark) watermark.style.display = "block";
-}
-
-function hideDevMode() {
-  devMode = false;
-  if (panel) panel.style.display = "none";
-  if (watermark) watermark.style.display = "none";
+function toggleDevMode() {
+  devMode = !devMode;
+  panel.style.display = devMode ? "block" : "none";
+  watermark.style.display = devMode ? "block" : "none";
 }
 
 // ------------------------------
-// Toggle with CTRL+ALT+SHIFT+D
+// Keybind: CTRL + ALT + SHIFT + D
 // ------------------------------
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === "d") {
@@ -103,14 +112,9 @@ document.addEventListener("keydown", (e) => {
       iframe.src === "about:blank" ||
       iframe.src.endsWith("about:blank");
 
-    // Only allow dev mode when no game is loaded
-    if (!blank) return;
+    if (!blank) return; // only when no game is loaded
 
-    if (devMode) {
-      hideDevMode();
-    } else {
-      showDevMode();
-    }
+    toggleDevMode();
   }
 });
 
@@ -119,7 +123,6 @@ document.addEventListener("keydown", (e) => {
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
-  if (!box) return;
 
   onUsersUpdate((users) => {
     let out = "ACTIVE USERS:\n\n";
