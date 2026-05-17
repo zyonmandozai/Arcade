@@ -46,6 +46,7 @@ function createDevPanel() {
   content.style.padding = "10px";
   content.style.height = "calc(100% - 32px)";
   content.style.overflowY = "auto";
+  content.textContent = "Loading users...";
 
   panel.appendChild(dragBar);
   panel.appendChild(content);
@@ -136,25 +137,32 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ------------------------------
-// Realtime User Updates
+// Realtime User Updates (WORKING)
 // ------------------------------
 function setupUserListener() {
   const box = document.getElementById("devUsers");
 
+  // Wait for Firebase to be ready
   setTimeout(() => {
     onUsersUpdate((users) => {
-      let out = "ACTIVE USERS:\n\n";
+      let out = "ACTIVE USERS\n\n";
+
       const keys = Object.keys(users || {});
       out += `Total: ${keys.length}\n\n`;
 
       keys.forEach((id) => {
         const u = users[id];
-        out += `${id} — ${u.game} — ${u.os} — ${u.browser} — ${u.screenSize}\n`;
+        out += `${id}\n`;
+        out += `  Game: ${u.game}\n`;
+        out += `  OS: ${u.os}\n`;
+        out += `  Browser: ${u.browser}\n`;
+        out += `  Screen: ${u.screenSize}\n`;
+        out += `\n`;
       });
 
       box.textContent = out;
     });
-  }, 300);
+  }, 500);
 }
 
 // ------------------------------
