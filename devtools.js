@@ -13,8 +13,9 @@ function createDevPanel() {
   panel.style.left = "50%";
   panel.style.top = "50%";
   panel.style.transform = "translate(-50%, -50%)";
-  panel.style.width = "620px";
-  panel.style.height = "640px";
+  panel.style.minWidth = "620px";
+  panel.style.minHeight = "500px";
+  panel.style.maxHeight = "90vh";
   panel.style.background = "rgba(0,0,0,0.85)";
   panel.style.border = "2px solid #00eaff";
   panel.style.boxShadow = "0 0 25px #00eaff";
@@ -26,7 +27,7 @@ function createDevPanel() {
   panel.style.zIndex = "999999";
   panel.style.display = "none";
   panel.style.overflow = "hidden";
-  panel.style.resize = "none";
+  panel.style.resize = "both";
   panel.style.boxSizing = "border-box";
 
   // Drag bar
@@ -41,25 +42,24 @@ function createDevPanel() {
   dragBar.style.paddingLeft = "10px";
   dragBar.textContent = "DEV CONSOLE";
 
-  // Content area
+  // Content area (scrolls)
   const content = document.createElement("div");
   content.id = "devUsers";
   content.style.whiteSpace = "pre";
   content.style.padding = "10px";
-  content.style.height = "calc(100% - 190px)";
   content.style.overflowY = "auto";
+  content.style.maxHeight = "50%";
   content.textContent = "Loading users...";
 
-  // Graph area
+  // Graph area (auto-expands)
   const graphArea = document.createElement("div");
   graphArea.id = "devGraphs";
   graphArea.style.whiteSpace = "pre";
-  graphArea.style.padding = "10px 10px 25px 10px";
-  graphArea.style.height = "190px";
+  graphArea.style.padding = "10px";
   graphArea.style.borderTop = "1px solid #00eaff";
-  graphArea.style.overflowY = "auto";
   graphArea.style.background = "rgba(0,0,0,0.4)";
   graphArea.style.textShadow = "0 0 5px #00eaff";
+  graphArea.style.overflow = "visible"; // <-- IMPORTANT
   graphArea.textContent = "Graphs loading...";
 
   panel.appendChild(dragBar);
@@ -240,7 +240,7 @@ function setupUserListener() {
       box.textContent = out;
 
       // ------------------------------
-      // GRAPHS
+      // GRAPHS (AUTO EXPANDING)
       // ------------------------------
       let graphOut = "";
       const maxGame = Math.max(...Object.values(gameCounts), 1);
@@ -263,6 +263,10 @@ function setupUserListener() {
       });
 
       graphBox.textContent = graphOut;
+
+      // AUTO‑RESIZE PANEL TO FIT CONTENT
+      panel.style.height = "auto";
+      panel.style.maxHeight = "90vh";
     });
   }, 500);
 }
