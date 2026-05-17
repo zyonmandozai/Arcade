@@ -2,7 +2,14 @@
 // FIREBASE IMPORTS
 // ------------------------------------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { 
+  getDatabase, 
+  ref, 
+  set, 
+  update, 
+  onValue, 
+  onDisconnect 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // ------------------------------------------------------
 // YOUR FIREBASE CONFIG
@@ -25,7 +32,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // ------------------------------------------------------
-// DEVICE + OS + BROWSER DETECTION (FIXED, BULLETPROOF)
+// DEVICE + OS + BROWSER DETECTION (BULLETPROOF)
 // ------------------------------------------------------
 function getDeviceInfo() {
   const ua = navigator.userAgent.toLowerCase();
@@ -88,7 +95,6 @@ if (!userId) {
 // ------------------------------------------------------
 export function registerUser() {
   const info = getDeviceInfo();
-
   const userRef = ref(db, "users/" + userId);
 
   set(userRef, {
@@ -99,6 +105,9 @@ export function registerUser() {
     game: "none",
     timestamp: Date.now()
   });
+
+  // Remove user when tab closes, browser closes, device sleeps, etc.
+  onDisconnect(userRef).remove();
 }
 
 // ------------------------------------------------------
