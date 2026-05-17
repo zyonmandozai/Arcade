@@ -1,85 +1,120 @@
-// ------------------------------
-// Firebase Initialization
-// ------------------------------
+// ------------------------------------------------------
+// FIREBASE IMPORTS
+// ------------------------------------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onDisconnect, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// ------------------------------------------------------
+// YOUR FIREBASE CONFIG
+// ------------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCrg276CwNLSwbRc0l-rEH5vga5GvbBU_Q",
   authDomain: "arcade-database-443a9.firebaseapp.com",
-  databaseURL: "https://arcade-database-443a9-default-rtdb.firebaseio.com",
   projectId: "arcade-database-443a9",
   storageBucket: "arcade-database-443a9.firebasestorage.app",
   messagingSenderId: "247055306423",
   appId: "1:247055306423:web:a66546856e6c823f228732",
-  measurementId: "G-Y6DPYFCV7K"
+  measurementId: "G-Y6DPYFCV7K",
+  databaseURL: "https://arcade-database-443a9-default-rtdb.firebaseio.com"
 };
 
+// ------------------------------------------------------
+// INIT FIREBASE
+// ------------------------------------------------------
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ------------------------------
-// Anonymous Session ID
-// ------------------------------
-export const sessionID = "User_" + Math.random().toString(36).substring(2, 10).toUpperCase();
-
-// ------------------------------
-// Device Info (allowed + safe)
-// ------------------------------
+// ------------------------------------------------------
+// DEVICE + OS + BROWSER DETECTION (FIXED, BULLETPROOF)
+// ------------------------------------------------------
 function getDeviceInfo() {
   const ua = navigator.userAgent.toLowerCase();
+
+  // ------------------------------
+  // OS DETECTION
+  // ------------------------------
   let os = "Unknown";
-  if (ua.includes("windows")) os = "Windows";
-  else if (ua.includes("mac")) os = "Mac";
+
+  if (ua.includes("cros")) os = "ChromeOS";                     // Chromebooks
+  else if (/ipad|iphone|ipod/.test(ua)) os = "iOS";             // iPad + iPhone
   else if (ua.includes("android")) os = "Android";
-  else if (ua.includes("iphone")) os = "iOS";
+  else if (ua.includes("windows")) os = "Windows";
+  else if (ua.includes("mac")) os = "Mac";
   else if (ua.includes("linux")) os = "Linux";
 
+  // ------------------------------
+  // DEVICE TYPE DETECTION
+  // ------------------------------
+  let deviceType = "Desktop";
+
+  if (ua.includes("cros")) deviceType = "Chromebook";
+  else if (/ipad/.test(ua)) deviceType = "Tablet";
+  else if (/iphone|ipod/.test(ua)) deviceType = "Phone";
+  else if (/android/.test(ua)) {
+    if (window.innerWidth > 900) deviceType = "Tablet";
+    else deviceType = "Phone";
+  }
+
+  // ------------------------------
+  // BROWSER DETECTION
+  // ------------------------------
   let browser = "Unknown";
-  if (ua.includes("chrome")) browser = "Chrome";
-  if (ua.includes("edg")) browser = "Edge";
-  if (ua.includes("firefox")) browser = "Firefox";
-  if (ua.includes("safari") && !ua.includes("chrome")) browser = "Safari";
+  if (ua.includes("opr") || ua.includes("opera")) browser = "Opera";
+  else if (ua.includes("edg")) browser = "Edge";
+  else if (ua.includes("chrome")) browser = "Chrome";
+  else if (ua.includes("firefox")) browser = "Firefox";
+  else if (ua.includes("safari")) browser = "Safari";
 
   const screenSize = `${window.innerWidth}x${window.innerHeight}`;
-  const deviceType = window.innerWidth < 768 ? "Phone" : "Desktop";
 
   return { os, browser, screenSize, deviceType };
 }
 
-// ------------------------------
-// Register User Online
-// ------------------------------
+// ------------------------------------------------------
+// USER ID GENERATION
+// ------------------------------------------------------
+function generateUserId() {
+  return "User_" + Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
+let userId = sessionStorage.getItem("arcadeUserId");
+if (!userId) {
+  userId = generateUserId();
+  sessionStorage.setItem("arcadeUserId", userId);
+}
+
+// ------------------------------------------------------
+// REGISTER USER IN FIREBASE
+// ------------------------------------------------------
 export function registerUser() {
   const info = getDeviceInfo();
 
-  const userRef = ref(db, "users/" + sessionID);
+  const userRef = ref(db, "users/" + userId);
+
   set(userRef, {
-    sessionID,
+    os: info.os,
+    browser: info.browser,
+    screen: info.screenSize,
+    deviceType: info.deviceType,
     game: "none",
-    online: true,
-    ...info,
     timestamp: Date.now()
   });
-
-  // Auto-remove on disconnect
-  onDisconnect(userRef).remove();
 }
 
-// ------------------------------
-// Update Game
-// ------------------------------
+// ------------------------------------------------------
+// UPDATE GAME (WHEN USER SELECTS A GAME)
+// ------------------------------------------------------
 export function updateGame(gameName) {
-  const userRef = ref(db, "users/" + sessionID);
+  const userRef = ref(db, "users/" + userId);
   update(userRef, {
     game: gameName,
     timestamp: Date.now()
   });
 }
 
-// ------------------------------
-// Listen for all users (Dev Mode)
-// ------------------------------
+// ------------------------------------------------------
+// REALTIME LISTENER FOR DEVTOOLS
+// ------------------------------------------------------
 export function onUsersUpdate(callback) {
   const usersRef = ref(db, "users/");
   onValue(usersRef, (snapshot) => {
