@@ -92,8 +92,9 @@
 <body>
 
 <div id="sidebar">
-  <div id="sidebarHeader">Zyon Arcade</div>
+  <div id="sidebarHeader">Zyon's Arcade</div>
   <div id="gameList">
+
     <div class="sectionTitle">Featured</div>
     <button class="gameBtn" data-game="design-the-next-phone.html">Design the Next Phone</button>
     <button class="gameBtn" data-game="stimulation-clicker.html">Stimulation Clicker</button>
@@ -147,6 +148,7 @@
     <button class="gameBtn" data-game="infinitecraft.html">Infinite Craft</button>
     <button class="gameBtn" data-game="idle.html">Idle</button>
     <button class="gameBtn" data-game="warp.html">Warp</button>
+
   </div>
 </div>
 
@@ -155,9 +157,6 @@
   <div id="emptyHint">
     <h1>Welcome to Zyon Arcade</h1>
     <div>Select a game on the left to start.</div>
-    <div style="margin-top:6px;font-size:12px;opacity:0.7;">
-      Dev Mode only unlocks when no game is loaded (CTRL + ALT + SHIFT + D).
-    </div>
   </div>
 </div>
 
@@ -185,7 +184,6 @@
     updateGame(game);
   };
 
-  // Hook up sidebar buttons
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
       const game = btn.dataset.game;
@@ -193,7 +191,6 @@
     });
   });
 
-  // Initial state: no game
   frame.src = "about:blank";
   emptyHint.style.display = "flex";
   updateGame("none");
