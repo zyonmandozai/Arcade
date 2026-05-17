@@ -59,7 +59,7 @@ function createDevPanel() {
   graphArea.style.borderTop = "1px solid #00eaff";
   graphArea.style.background = "rgba(0,0,0,0.4)";
   graphArea.style.textShadow = "0 0 5px #00eaff";
-  graphArea.style.overflow = "visible"; // <-- IMPORTANT
+  graphArea.style.overflow = "visible";
   graphArea.textContent = "Graphs loading...";
 
   panel.appendChild(dragBar);
@@ -201,10 +201,15 @@ function setupUserListener() {
 
       keys.forEach((id) => {
         const u = users[id];
-        if (!osCounts[u.os]) osCounts[u.os] = 0;
-        osCounts[u.os]++;
-        if (!deviceCounts[u.deviceType]) deviceCounts[u.deviceType] = 0;
-        deviceCounts[u.deviceType]++;
+
+        const os = u.os || "Unknown";
+        const dt = u.deviceType || "Unknown";
+
+        if (!osCounts[os]) osCounts[os] = 0;
+        osCounts[os]++;
+
+        if (!deviceCounts[dt]) deviceCounts[dt] = 0;
+        deviceCounts[dt]++;
       });
 
       out += "DEVICE BREAKDOWN\n";
