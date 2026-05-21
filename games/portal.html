@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Portal Maze</title>
+<style>
+body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+canvas { background:#111; border:2px solid #fff; }
+</style>
+</head>
+<body>
+<canvas id="game" width="500" height="500"></canvas>
+<script>
+const c = document.getElementById("game");
+const x = c.getContext("2d");
+
+let grid, px, py, portals, keys;
+
+function reset() {
+    grid = [];
+    for (let y=0;y<10;y++) {
+        const row = [];
+        for (let x=0;x<10;x++) {
+            row.push(Math.random()<0.2?1:0);
+        }
+        grid.push(row);
+    }
+    grid[0][0] = 0;
+    grid[9][9] = 0;
+
+    px = 0;
+    py = 0;
+
+    portals = [
+        {x:2,y:2,tx:7,ty:7},
+        {x:7,y:3,tx:1,ty:8}
+    ];
+
+    keys = {};
+}
+window.addEventListener("keydown", e => keys[e.code] = true);
+
+function update() {
+    let dx=0, dy=0;
+    if (keys["ArrowUp"]) dy=-1;
+    if (keys["ArrowDown"]) dy=1;
+    if (keys["ArrowLeft"]) dx=-1;
+    if (keys["ArrowRight"]) dx=1;
+
+    if (dx||dy) {
+        const nx = px+dx;
+        const ny = py+dy;
+        if (nx>=0 && nx<10 && ny>=0 && ny<10 && grid[ny][nx]===0) {
+            px = nx;
+            py = ny;
+        }
+        keys["ArrowUp"]=keys["ArrowDown"]=keys["ArrowLeft"]=keys["ArrowRight"]=false;
+    }
+
+    for (const p of portals) {
+        if (px===p.x && py===p.y) {
+            px = p.tx;
+            py = p.ty;
+        }
+    }
+}
+
+function draw() {
+    const size = 50;
+    x.fillStyle = "#111";
+    x.fillRect(0,0,500,500);
+
+    for (let y=0;y<10;y++) {
+        for (let x2=0;x2<10;x2++) {
+            if (grid[y][x2]===1) {
+                x.fillStyle = "#333";
+                x.fillRect(x2*size,y*size,size,size);
+            }
+        }
+    }
+
+    x.fillStyle = "#0ff";
+    portals.forEach(p => {
+        x.fillRect(p.x*size+10,p.y*size+10,size-20,size-20);
+    });
+
+    x.fillStyle = "#0f0";
+    x.fillRect(px*size+10,py*size+10,size-20,size-20);
+
+    x.fillStyle = "#ff0";
+    x.fillRect(9*size+10,9*size+10,size-20,size-20);
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

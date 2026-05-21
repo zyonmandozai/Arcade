@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Breakout</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#111; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let paddleX, ballX, ballY, ballVX, ballVY, bricks, keys;
+
+function reset() {
+    paddleX = 160;
+    ballX = 200;
+    ballY = 300;
+    ballVX = 3;
+    ballVY = -3;
+    keys = {};
+    bricks = [];
+    const rows = 5, cols = 8;
+    for (let r=0;r<rows;r++) {
+        for (let c=0;c<cols;c++) {
+            bricks.push({x:20+c*45,y:40+r*20,w:40,h:15,alive:true});
+        }
+    }
+}
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+function update() {
+    if (keys['ArrowLeft']) paddleX -= 6;
+    if (keys['ArrowRight']) paddleX += 6;
+    paddleX = Math.max(0, Math.min(320, paddleX));
+
+    ballX += ballVX;
+    ballY += ballVY;
+
+    if (ballX < 10 || ballX > 390) ballVX *= -1;
+    if (ballY < 10) ballVY *= -1;
+    if (ballY > 600) reset();
+
+    if (ballY > 560 && ballY < 580 && ballX > paddleX && ballX < paddleX+80) {
+        ballVY *= -1;
+        ballY = 560;
+    }
+
+    for (const b of bricks) {
+        if (!b.alive) continue;
+        if (ballX > b.x && ballX < b.x+b.w && ballY > b.y && ballY < b.y+b.h) {
+            b.alive = false;
+            ballVY *= -1;
+            break;
+        }
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,400,600);
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(paddleX,570,80,10);
+
+    ctx.beginPath();
+    ctx.arc(ballX,ballY,8,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#0ff';
+    for (const b of bricks) {
+        if (!b.alive) continue;
+        ctx.fillRect(b.x,b.y,b.w,b.h);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

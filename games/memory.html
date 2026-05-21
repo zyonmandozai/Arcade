@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Memory Match</title>
+<style>
+body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+.grid { display:grid; grid-template-columns:repeat(4,80px); gap:10px; }
+.card { width:80px; height:80px; background:#333; color:#000; display:flex; justify-content:center; align-items:center; font-size:32px; cursor:pointer; }
+.revealed { background:#fff; }
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+
+<script>
+let values = [];
+for (let i=1;i<=8;i++) values.push(i,i);
+values.sort(()=>Math.random()-0.5);
+
+let first = null;
+let lock = false;
+
+const grid = document.getElementById("grid");
+
+values.forEach((v,i)=>{
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.value = v;
+    card.onclick = () => reveal(card);
+    grid.appendChild(card);
+});
+
+function reveal(card) {
+    if (lock || card.classList.contains("revealed")) return;
+
+    card.classList.add("revealed");
+    card.innerText = card.dataset.value;
+
+    if (!first) {
+        first = card;
+    } else {
+        if (first.dataset.value === card.dataset.value) {
+            first = null;
+        } else {
+            lock = true;
+            setTimeout(()=>{
+                first.classList.remove("revealed");
+                card.classList.remove("revealed");
+                first.innerText = "";
+                card.innerText = "";
+                first = null;
+                lock = false;
+            },800);
+        }
+    }
+}
+</script>
+</body>
+</html>

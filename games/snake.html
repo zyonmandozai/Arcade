@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Clone</title>
+    <style>
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+        canvas { background:#111; border:2px solid #fff; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const grid = 20;
+const tilesX = 20;
+const tilesY = 30;
+
+let snake, dir, food, timer, gameOver, keys;
+
+function reset() {
+    snake = [{x:10,y:15}];
+    dir = {x:1,y:0};
+    food = {x:5,y:5};
+    timer = 0;
+    gameOver = false;
+    keys = {};
+}
+window.addEventListener('keydown', e => keys[e.code] = true);
+
+function update() {
+    if (gameOver) return;
+
+    if (keys['ArrowUp'] && dir.y !== 1) dir = {x:0,y:-1};
+    if (keys['ArrowDown'] && dir.y !== -1) dir = {x:0,y:1};
+    if (keys['ArrowLeft'] && dir.x !== 1) dir = {x:-1,y:0};
+    if (keys['ArrowRight'] && dir.x !== -1) dir = {x:1,y:0};
+
+    timer++;
+    if (timer < 8) return;
+    timer = 0;
+
+    const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+    if (head.x < 0 || head.x >= tilesX || head.y < 0 || head.y >= tilesY) {
+        gameOver = true;
+        return;
+    }
+
+    for (const p of snake) {
+        if (p.x === head.x && p.y === head.y) {
+            gameOver = true;
+            return;
+        }
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+        food = {
+            x: Math.floor(Math.random()*tilesX),
+            y: Math.floor(Math.random()*tilesY)
+        };
+    } else {
+        snake.pop();
+    }
+}
+
+function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = '#0f0';
+    snake.forEach(p => ctx.fillRect(p.x*grid, p.y*grid, grid, grid));
+
+    ctx.fillStyle = '#f00';
+    ctx.fillRect(food.x*grid, food.y*grid, grid, grid);
+
+    if (gameOver) {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = '32px system-ui';
+        ctx.fillText('Game Over', 120, 260);
+        ctx.font = '20px system-ui';
+        ctx.fillText('Refresh to restart', 110, 300);
+    }
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Stack Game</title>
+<style>
+body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+canvas { background:#111; border:2px solid #fff; }
+</style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const c = document.getElementById("game");
+const x = c.getContext("2d");
+
+let layers, speed, dir, currentX, currentW, height;
+
+function reset() {
+    layers = [{x:100,y:550,w:200}];
+    speed = 3;
+    dir = 1;
+    currentX = 100;
+    currentW = 200;
+    height = 550;
+}
+window.addEventListener("keydown", e => {
+    if (e.code === "Space") place();
+});
+
+function place() {
+    const last = layers[layers.length-1];
+    const overlap = Math.min(last.x+last.w, currentX+currentW) - Math.max(last.x, currentX);
+    if (overlap <= 0) return reset();
+    currentW = overlap;
+    currentX = Math.max(last.x, currentX);
+    layers.push({x:currentX,y:height,w:currentW});
+    height -= 20;
+    if (height < 0) reset();
+}
+
+function update() {
+    currentX += speed * dir;
+    if (currentX < 0 || currentX + currentW > 400) dir *= -1;
+}
+
+function draw() {
+    x.fillStyle = "#000";
+    x.fillRect(0,0,400,600);
+
+    layers.forEach(l => {
+        x.fillStyle = "#0f0";
+        x.fillRect(l.x,l.y,l.w,20);
+    });
+
+    x.fillStyle = "#ff0";
+    x.fillRect(currentX,height,currentW,20);
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>

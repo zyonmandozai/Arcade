@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tower Builder</title>
+<style>
+body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+canvas { background:#111; border:2px solid #fff; }
+</style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const c = document.getElementById("game");
+const x = c.getContext("2d");
+
+let blocks, currentX, dir, height;
+
+function reset() {
+    blocks = [{x:100,y:550,w:200}];
+    currentX = 100;
+    dir = 3;
+    height = 530;
+}
+window.addEventListener("keydown", e => {
+    if (e.code === "Space") place();
+});
+
+function place() {
+    const last = blocks[blocks.length-1];
+    const overlap = Math.min(last.x+last.w, currentX+200) - Math.max(last.x, currentX);
+    if (overlap <= 0) return reset();
+    blocks.push({x:Math.max(last.x,currentX),y:height,w:overlap});
+    height -= 20;
+    if (height < 0) reset();
+}
+
+function update() {
+    currentX += dir;
+    if (currentX < 0 || currentX+200 > 400) dir *= -1;
+}
+
+function draw() {
+    x.fillStyle = "#111";
+    x.fillRect(0,0,400,600);
+
+    blocks.forEach(b => {
+        x.fillStyle = "#0f0";
+        x.fillRect(b.x,b.y,b.w,20);
+    });
+
+    x.fillStyle = "#ff0";
+    x.fillRect(currentX,height,200,20);
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+reset();
+loop();
+</script>
+</body>
+</html>
